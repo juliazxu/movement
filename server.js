@@ -6,14 +6,6 @@ var path = require('path'),
 var pgp = require('pg-promise')(/*options*/)
 var db = pgp('postgres://postgres:postgres@localhost:5432/movement')
 
-db.any('SELECT * from persons')
-  .then( (data) => {
-    console.log('DATA:', data.value)
-  })
-  .catch( (error) => {
-    console.log('ERROR:', error)
-  })
-
 if (process.env.NODE_ENV !== 'production') {
     console.log('DEVOLOPMENT ENVIRONMENT: Turning on WebPack Middleware...')
     webpackDevHelper.useWebpackMiddleware(app)
@@ -56,6 +48,21 @@ const messageType = "ARN";
 
 console.log("## MessagingClient.message ##");
 
+async function sendMessages(user_id, recipient_user_id, message_text) {
+    await db.any(`
+    INSERT INTO messages (sender_user_id, recipient_user_id, message_text)
+    VALUES ($1, $2, $3)
+    `, [user_id, recipient_user_id, message_text]);
+}
+
+db.any('SELECT * from persons')
+  .then( (data) => {
+    console.log('DATA:', data.value)
+  })
+  .catch( (error) => {
+    console.log('ERROR:', error)
+  })
+
 function messageCallback(error, responseBody) {
     if (error === null) {
         console.log(`Messaging response for messaging phone number: ${phoneNumber}` +
@@ -65,4 +72,5 @@ function messageCallback(error, responseBody) {
         console.error("Unable to send message. " + error);
     }
 }
+
 client.sms.message(messageCallback, phoneNumber, message, messageType);
