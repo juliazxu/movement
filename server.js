@@ -3,6 +3,16 @@ var path = require('path'),
 		app = express(),
 		webpackDevHelper = require('./index.dev.js')
 
+var pgp = require('pg-promise')(/*options*/)
+var db = pgp('postgres://postgres:postgres@localhost:5432/movement')
+
+db.any('SELECT * from persons')
+  .then( (data) => {
+    console.log('DATA:', data.value)
+  })
+  .catch( (error) => {
+    console.log('ERROR:', error)
+  })
 
 if (process.env.NODE_ENV !== 'production') {
     console.log('DEVOLOPMENT ENVIRONMENT: Turning on WebPack Middleware...')
