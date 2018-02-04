@@ -3,6 +3,8 @@ var path = require('path'),
 		app = express(),
 		webpackDevHelper = require('./index.dev.js')
 
+var pgp = require('pg-promise')(/*options*/)
+var db = pgp('postgres://postgres:postgres@localhost:5432/movement')
 
 if (process.env.NODE_ENV !== 'production') {
     console.log('DEVOLOPMENT ENVIRONMENT: Turning on WebPack Middleware...')
@@ -46,7 +48,25 @@ const messageType = "ARN";
 
 console.log("## MessagingClient.message ##");
 
-function messageCallback(error, responseBody) {
+// sendMessage
+app.post('/api/petitions', (req, res, next) => {
+	await db.any(`
+		INSERT INTO petitions (title, body, author_id)
+			VALUES ($1, $2, $3)
+	`, [req.body.title, req.body.body, req.body.author_id]);
+});
+
+// sendMessages('test-title', 'this is a cool petition', 1);
+
+// db.any('SELECT * from persons')
+//   .then( (data) => {
+//     console.log('DATA:', data.value)
+//   })
+//   .catch( (error) => {
+//     console.log('ERROR:', error)
+//   })
+
+messageCallback = (error, responseBody) => {
     if (error === null) {
         console.log(`Messaging response for messaging phone number: ${phoneNumber}` +
             ` => code: ${responseBody['status']['code']}` +
@@ -55,4 +75,5 @@ function messageCallback(error, responseBody) {
         console.error("Unable to send message. " + error);
     }
 }
+
 client.sms.message(messageCallback, phoneNumber, message, messageType);
