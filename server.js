@@ -48,22 +48,25 @@ const messageType = "ARN";
 
 console.log("## MessagingClient.message ##");
 
-async function sendMessages(user_id, recipient_user_id, message_text) {
-    await db.any(`
-    INSERT INTO messages (sender_user_id, recipient_user_id, message_text)
-    VALUES ($1, $2, $3)
-    `, [user_id, recipient_user_id, message_text]);
-}
+// sendMessage
+app.post('/api/petitions', (req, res, next) => {
+	await db.any(`
+		INSERT INTO petitions (title, body, author_id)
+			VALUES ($1, $2, $3)
+	`, [req.body.title, req.body.body, req.body.author_id]);
+});
 
-db.any('SELECT * from persons')
-  .then( (data) => {
-    console.log('DATA:', data.value)
-  })
-  .catch( (error) => {
-    console.log('ERROR:', error)
-  })
+// sendMessages('test-title', 'this is a cool petition', 1);
 
-function messageCallback(error, responseBody) {
+// db.any('SELECT * from persons')
+//   .then( (data) => {
+//     console.log('DATA:', data.value)
+//   })
+//   .catch( (error) => {
+//     console.log('ERROR:', error)
+//   })
+
+messageCallback = (error, responseBody) => {
     if (error === null) {
         console.log(`Messaging response for messaging phone number: ${phoneNumber}` +
             ` => code: ${responseBody['status']['code']}` +
