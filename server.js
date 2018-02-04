@@ -22,7 +22,7 @@ app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname, 'assets/index.html'))
 })
 
-app.listen(3000);
+app.listen(3456);
 
 // TELESIGN SDK
 
@@ -40,7 +40,7 @@ const client = new TeleSignSDK( customerId,
     // userAgent
 );
 
-const phoneNumber = "3019804834";
+const phoneNumber = "13019804834";
 const message = "You're scheduled for a dentist appointment at 2:30PM.";
 const messageType = "ARN";
 
@@ -48,9 +48,9 @@ console.log("## MessagingClient.message ##");
 
 function messageCallback(error, responseBody) {
     if (error === null) {
-        console.log("Messaging response for messaging phone number: ${phoneNumber}" +
-            " => code: ${responseBody['status']['code']}" +
-            ", description: ${responseBody['status']['description']}");
+        console.log(`Messaging response for messaging phone number: ${phoneNumber}` +
+            ` => code: ${responseBody['status']['code']}` +
+            `, description: ${responseBody['status']['description']}`);
     } else {
         console.error("Unable to send message. " + error);
     }
