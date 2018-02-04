@@ -22,4 +22,37 @@ app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname, 'assets/index.html'))
 })
 
-app.listen(3000)
+app.listen(3456);
+
+// TELESIGN SDK
+
+var TeleSignSDK = require('telesignsdk');
+
+const customerId = "661143F9-BD7C-4199-B4A9-5EFCF1CA7C25";
+const apiKey = "/dR+fRG9WftRkENgupQViBeOs2TfeRcIvEs2NE8T+8pg/D5fMp6/vuG/oZvItvcQePwSsS2d7Ol5uGFdv/GPRw==";
+const rest_endpoint = "https://rest-api.telesign.com";
+const timeout = 10*1000; // 10 secs
+
+const client = new TeleSignSDK( customerId,
+    apiKey,
+    rest_endpoint,
+    timeout // optional
+    // userAgent
+);
+
+const phoneNumber = "13019804834";
+const message = "You're scheduled for a dentist appointment at 2:30PM.";
+const messageType = "ARN";
+
+console.log("## MessagingClient.message ##");
+
+function messageCallback(error, responseBody) {
+    if (error === null) {
+        console.log(`Messaging response for messaging phone number: ${phoneNumber}` +
+            ` => code: ${responseBody['status']['code']}` +
+            `, description: ${responseBody['status']['description']}`);
+    } else {
+        console.error("Unable to send message. " + error);
+    }
+}
+client.sms.message(messageCallback, phoneNumber, message, messageType);
